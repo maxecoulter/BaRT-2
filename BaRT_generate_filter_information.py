@@ -341,8 +341,6 @@ def main(genome_file):
 	
 	Parameters
 	----------
-	fileprefix : str
-		The file prefix from commandline argument
 	genome_file : str
 		path to genome file
 	"""
@@ -351,12 +349,12 @@ def main(genome_file):
 	fileprefix = args[0]
 
 	readdict = {}
-	posdict = {}#Dictionary with readkey as keys and start and ends recorded in list [0] is start and [1] is end
+	posdict = {}
 	sj_no_dict = {}
 	sj_error_profile_dict = {}
 	linedict = {}
 	dictofmultimaps = {}
-	single_exon_dict = {}#Read is key with start and end as list
+	single_exon_dict = {}
 	print("Parsing density error file to find splice junctions")
 	density_error_parser(fileprefix,readdict,posdict,sj_no_dict,sj_error_profile_dict,linedict,dictofmultimaps,single_exon_dict)
 
