@@ -120,7 +120,7 @@ def cluster_products(product_size,product_sizes,window):
 				return True
 	return False
 
-def cluster_transcriptome_products(product_dict,products_clustered):
+def cluster_transcriptome_products(product_dict,products_clustered,window):
 	for primer_name in product_dict.keys():
 		products_clustered[primer_name] = {}
 		clusters = {}
@@ -132,7 +132,7 @@ def cluster_transcriptome_products(product_dict,products_clustered):
 			else:
 				clustername = False
 				for cluster1 in clusters.keys():
-					if cluster_products(product_info[0],clusters[cluster1],6):
+					if cluster_products(product_info[0],clusters[cluster1],window):
 						clustername = cluster1
 						break
 				if not clustername:
@@ -165,7 +165,7 @@ def combine_salmon_reps(salmon_quants_dict,repinfo):
 		salmon_quants_dict2[transcript] = sample_average_quants
 	return salmon_quants_dict2
 
-def convert_names(salmon_quants_dict2):
+def convert_names(salmon_quants_dict2,padded):
 	#Now convert names (just for bart1)
 	#Note from Micha No, these are Paulo's original names (from Stringtie). We converted them to BART IDs because the original names were awful and useless. The ID numbers have stayed the same though -- so converting is easy. So for example MSTRG.22 becomes BART1_0-p00022 (or BART1_0-u00022 in the unpadded version of BART). Syntax is BART1_0-[p|u] followed by the five digit ID number, left-padded with leading zeroes.
 	#My gene name: MSTRG.1.1gene=MSTRG.1
@@ -183,7 +183,11 @@ def convert_names(salmon_quants_dict2):
 				decimal += "0"
 			bartnumber += str(t_split[1])
 			decimal += str(t_split[-1])
-			salmon_quants_dict3["BART1_0-u" + bartnumber + "." + decimal] = salmon_quants_dict2[transcript]
+			if padded:
+				p = "p"
+			else:
+				p = "u"
+			salmon_quants_dict3["BART1_0-" + p + bartnumber + "." + decimal] = salmon_quants_dict2[transcript]
 		else:
 			return salmon_quants_dict2
 	print(list(salmon_quants_dict3.keys())[0:10])
@@ -337,6 +341,20 @@ def match_to_RT_PCR_products(products_clustered,matched_products,complete_matche
 			one_match_only.add(primer_name)
 			continue
 		RT_products_matched = set()
+		#####Below matches RT PCR product to closest product, as in Paulo's script######
+		"""for product_main in RT_PCR_size_dict[primer_name]:
+			for i in range(0,window):#Take the best match only
+				if product_main + i in products_clustered[primer_name].keys() and product_main + i not in RT_products_matched:
+					product_dict.setdefault(product_main,set()).add(product_main + i)
+					RT_products_matched.add(product_main + i)
+					break
+				elif product_main - i in products_clustered[primer_name].keys() and product_main - i not in RT_products_matched:
+					product_dict.setdefault(product_main,set()).add(product_main - i)
+					RT_products_matched.add(product_main - i)
+					break
+				else:
+					pass"""
+		#####Alternatively this matches all products in window (below)####
 		for product in products_clustered[primer_name].keys():
 			for product_main in RT_PCR_size_dict[primer_name]:
 				if product in RT_products_matched:
@@ -461,11 +479,13 @@ def main():
 	parser.add_argument('-b', dest = 'BLAST_input', type = str, help = 'BLASTn input')
 	parser.add_argument('-p', dest = 'RT_PCR_input', type = str, help = 'RT_PCR input file')
 	parser.add_argument('-s', dest = 'salmon_quants_folder',type = str, help = 'salmon quants folder path')
-	parser.add_argument('-w', dest = 'window',type = int, help = 'Size of window for combining predicted primer products')
+	parser.add_argument('-w', dest = 'window',type = int, help = 'Size of window for combining predicted and actual PCR products')
+	parser.add_argument('-cw', dest = 'cwindow',type = int, help = 'Size of window for clustering similar predicted primer products')
 	parser.add_argument('-o', dest = 'scatterplot_output',type = str, help = 'Name of scatterplot output file')
 	parser.add_argument('-reps', dest = 'reps',type = bool, help = 'Are there salmon quant reps, True or False?',default = False)
 	parser.add_argument('-rep_info', dest = 'rep_info',type = int, help = 'Length of rep suffix. E.g <sample_name>_a,<sample_name>_b')
 	parser.add_argument('-bart_names', dest = 'bart_names',type = bool, help = 'Particular to Bart1. Need to change names',default = False)
+	parser.add_argument('-padded', dest = 'padded',type = bool, help = 'Particular to Bart1. if padded.',default = False)
 	#parser.parse_args(['--foo', '2'])
 	args = parser.parse_args()
 	destination_path = "/".join(args.scatterplot_output.split("/")[:-1]) + "/"
@@ -476,7 +496,7 @@ def main():
 	if args.reps: #Combines salmon reps together
 		salmon_quants_dict = combine_salmon_reps(salmon_quants_dict,args.rep_info)
 	if args.bart_names:
-		salmon_quants_dict = convert_names(salmon_quants_dict)
+		salmon_quants_dict = convert_names(salmon_quants_dict,args.padded)
 	
 	primer_hits_F = {}#key is self.primer_name, value is dictionary with key as perfect, second, third, values as primer_info object
 	primer_hits_R = {}#key is self.primer_name, value is dictionary with key as perfect, second, third, values as primer_info object
@@ -484,10 +504,7 @@ def main():
 		primer_info = Parse_BLAST(line)
 		primer_info.process(primer_hits_F,primer_hits_R)
 	#Generate set of paired primers:
-	all_primer_pairs_with_hits = set()
-	for primer_name in primer_hits_F.keys():
-		if primer_name in primer_hits_R.keys():
-			all_primer_pairs_with_hits.add(primer_name)
+	all_primer_pairs_with_hits = set([primer_name for primer_name in primer_hits_F.keys() if primer_name in primer_hits_R.keys()])
 	print(str(len(all_primer_pairs_with_hits)))
 	#Parse RT-PCR table
 	#Primer	Size	B1	B4	B5	B6	B7	B46	B48	B53	B71	B74	B79	B87
@@ -501,7 +518,7 @@ def main():
 	category_dict = {} #primer_name is key, list of categories are value
 	products_in_order(primer_hits_F,primer_hits_R,all_primer_pairs_with_hits,product_dict,failed_primers,category_dict)
 	products_clustered = {} #key is primer_name, value is dict, with keys as products and values as list of transcripts which 
-	cluster_transcriptome_products(product_dict,products_clustered)
+	cluster_transcriptome_products(product_dict,products_clustered,args.cwindow)
 	print(str(len(products_clustered.keys())))
 	#Now compare this list to the list of predicted products from RT-PCR data
 	matched_products = {}#primer_name is key, dictionary (with RT_PCR product as key and list of matched transcriptome products as values) as value
@@ -514,7 +531,7 @@ def main():
 	#Transcript	B46	B5	B74	B7	B1	B6	B87	B71	B48	B79	B4	B53
 	all_RT_PCR_proportions = []
 	all_transcriptome_proportions = []
-	get_proportions(complete_matches,matched_products,products_clustered,salmon_quants_dict,RT_PCR_proportions_dict,all_RT_PCR_proportions,all_transcriptome_proportions,destination_path + "results.txt")
+	get_proportions(complete_matches,matched_products,products_clustered,salmon_quants_dict,RT_PCR_proportions_dict,all_RT_PCR_proportions,all_transcriptome_proportions,args.scatterplot_output + "_results.txt")
 	scatter_plot(all_transcriptome_proportions,all_RT_PCR_proportions,args.scatterplot_output,"transcriptome proportions","RT PCR proportions","black",False)
 	print("Data points: " + str(len(all_RT_PCR_proportions)))
 	print("Pearson correlation: " + str(scipy.stats.pearsonr(all_transcriptome_proportions,all_RT_PCR_proportions)))
