@@ -140,11 +140,74 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   
   Detailed explanation of arguments:
   
-  **-i all_splice_junction_table.txt** This input is the collated per sample output from **BaRT_generate_filter_information.py**. It is described in more detail above.
+  **-i all_splice_junction_table.txt** This input is the collated per sample output from **BaRT_generate_filter_information.py**. It is described in more detail above. This provides the program with splice junction, read and trnascript information.
   
   **-bedn merge.bed** This is the merged transcriptome from tama merge. 
   
-  **-bed merge_noNs.bed** This is an optional argument. With the barley genome there are stretches of Ns caused by gaps in the genome. When reads overlap these regions this can cause downstream annotation problems. It is best to remove all reads overlapping Ns (using bedtools intersect) and use the resulting filtered bed file as an input here. PLEASE NOTE: You still need the original unfiltered merged transcriptome from tama merge as input if you have a file as input here
+  **-bed merge_noNs.bed** This is an optional argument. With the barley genome there are stretches of Ns caused by gaps in the genome. When reads overlap these regions this can cause downstream annotation problems. It is best to remove all reads overlapping Ns (using bedtools intersect) and use the resulting filtered bed file as an input here. PLEASE NOTE: You still need the original unfiltered merged transcriptome from tama merge as input if you have a file as input here.
+  
+  **-sr all_short_sjs.tab** This is an optional argument. This allows splice junctions from short reads to be used to support long read based splice junctions. Currently only works for the barley cv. Barke genome.
+  
+  **-g genome.fasta** The genome reference file used for mapping of Iso-Seq.
+  
+  **-pA all_collapsed_polya.txt** This is the collated poly(A) output from tama collapse, from \<prefix>\_polya.txt files.
+  
+  **-s all_single_exon_reads.txt** The collated single exon reads file from **BaRT_generate_filter_information.py**. This provides information on reads without splice junctions.
+  
+  **-o output_prefix** This is the prefix used in outfiles
+  
+#### Outputs
+
+**BaRT_2_filter_binomial.py** produces the following outputs:
+
+**\<prefix>\_merged_filtered.bed** This is the filtered .bed file output that is the main result of filtering process. In order to produce an updated Iso-Seq transcriptome, TAMA merge will need to be run again using this as input.
+
+**\<prefix>\_removed.bed** This is a .bed file of transcripts that have been removed from the input .bed file in the filtering process.
+
+**\<prefix>\_low_confidence.bed** This is a .bed file of transcripts from genes with low read support, and so are low confidence with regard to 5' and 3' ends. They will have high confidence splice junctions. In BaRTv2.0 these transcripts were included if they had support from Illumina transcripts.
+
+**\<prefix>\_transcript_info** This is a tab delimited text file showing information on each transcript. The format is as follows:
+
+    Transcript	PolyA Error	low expressed	rescued	high confidence	5' support	3' support	splice junctions supported
+    G1.1	False	False	False	False	False	True	True
+    G1.2	False	False	False	False	False	True	True
+    G1.3	False	False	False	False	False	True	True
+    G1.4	False	False	False	False	False	True	True
+    G1.5	False	False	False	False	False	True	True
+    G1.6	False	False	False	False	False	True	True
+    G1.7	False	False	False	False	False	True	True
+    G1.8	False	False	False	False	False	True	True
+    G1.9	False	False	False	True	True	True	True
+    G1.10	False	False	False	True	True	True	True
+    
+    
+    
+  a) Column 1, Transcript id;
+  
+  b) Column 2, True or False, whether trancript has PolyAs at 3' end in genome (possible mispriming). If true, transcript will have been removed;
+  
+  c) Column 3, True or False, whether transcript is from a low expressed gene;
+  
+  d) Column 4, True or False, whether the longest transcript with most splice junctions from low expressed genes with no support for 5' and 3' ends has been "rescued" (added to the main .bed file). This is currently not used and is not recommended, so all transcripts will be False here.
+  
+  e) Column 5, True or False, whether transcript is high confidence. If True, the transcript has good support for 5' and 3' ends;
+  
+  f) Column 6, True or False, whether transcript has support for 5' end, either by multiple reads within a window or by a high confidence TSS site;
+  
+  g) Column 7, True or False, whether transcript has support for 3' end, either by multiple reads within a window or by a high confidence TES site;
+  
+  h) Column 8, True or False, whether transcript has support from high confidence splice junctions. If all transcript splice junctions are present in the high confidence set of splice junctions, this will be True
+  
+  
+  
+  
+
+
+  
+  
+  
+  
+  
     
 
 
