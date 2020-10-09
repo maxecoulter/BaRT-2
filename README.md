@@ -25,9 +25,9 @@ Usage: python BaRT_generate_filter_information.py input genome file
 
 #### Output
 
-The following outputs are poduced
+The following outputs are poduced:
 
-\<prefix>\_splice_junction_table.txt
+1. **\<prefix>\_splice_junction_table.txt**
  
  This a tab delimited text file in this format:
  
@@ -42,6 +42,7 @@ The following outputs are poduced
     m54203_191129_023846/20775159/ccs	G1.2	8	____________________________D_>______________________________	chr1H_107700_107776_-	CTAC	104372	107925
 
 Where:
+
   a) Column 1, read id;
 
   b) Column 2, transcript id;
@@ -58,6 +59,19 @@ Where:
   
   h) Column 8, Read map position (end)
   
+  
+  2. **\<prefix>\_single_exon_reads.txt**
+  
+  This is a tab delimited text file in this format:
+  
+      m54203_191129_023846/5243497/ccs	G8.1	chr1H	205480	206287	-
+    m54203_191129_023846/53609273/ccs	G26.40	chr1H	2898678	2898891	+
+    m54203_191129_023846/51118505/ccs	G27.1	chr1H	2913273	2913832	+
+    m54203_191129_023846/22610633/ccs	G36.1	chr1H	4336426	4337540	-
+    m54203_191129_023846/39321962/ccs	G37.1	chr1H	4597766	4599137	-
+    m54203_191129_023846/24576989/ccs	G37.2	chr1H	4597768	4599133	-
+    m54203_191129_023846/29163745/ccs	G42.4	chr1H	5045380	5046038	+
+    m54203_191129_023846/30867754/ccs	G46.4	chr1H	5095629	5098167	-
   
   
   
