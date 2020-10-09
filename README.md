@@ -96,7 +96,7 @@ Where:
   
   5. **\<prefix>\_reads_sjna**
   
-  Any splice junctions with errors are reported here. This file should be empty, if not it means there is a problem with the mapping, or the input. The file is a list of splice junction ids \(<read id>_<splice junction number>). 
+  Any splice junctions with errors are reported here. This file should be empty, if not it means there is a problem with the mapping, or the input. The file is a list of splice junction ids (\<read id>_<splice junction number>\). 
   
 
 ### BaRT_2_filter_binomial.py
