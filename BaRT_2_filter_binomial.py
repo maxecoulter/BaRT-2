@@ -4,8 +4,7 @@ Author: Max Coulter, based on algorithms created by Runxuan Zhang and John Brown
 For creating RTD based on Iso-Seq and Illumina data, using output from TAMA
 """
 
-#import optparse
-#from optparse import OptionParser
+
 import time
 import sys
 import os
@@ -17,11 +16,8 @@ from itertools import repeat
 import matplotlib
 import pandas as pd
 import numpy
-#import scipy
-#import statsmodels
-#import ggplot
-#from pandas.lib import Timestamp
 from plotnine import *
+
 #For venn diagram
 from matplotlib import pyplot as plt
 from matplotlib_venn import venn3, venn3_circles
@@ -29,14 +25,12 @@ import statsmodels
 from statsmodels import stats
 from statsmodels.stats import multitest
 import argparse
-#from scipy.stats import fisher_exact
-#Import stats modules
+
 
 import scipy.stats as stats
 from scipy.stats import fisher_exact as fishers_exact_test
 
 
-logging.basicConfig(filename='SIFT.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 start1 = time.time()
 
 conversiondict = {"chr1H":205415724,"chr2H":295953730,"chr3H":267034671,"chr4H":273224149,"chr5H":209770093,"chr6H":246027230,"chr7H":316571039}#For converting split Barke file to whole
@@ -44,23 +38,6 @@ readsupportcutoff = 5 #Min read support for splice junction
 min_overhang = 10 #min overhang for splice junction
 
 
-
-#infile = "all_splice_junction_table2.txt"
-#bedinput="/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/merged.bed"#.bed output from tama merge (before filtering)
-#bedinput = "/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/merged_noNs.bed" #Ns removed
-#bedinput2 = "/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/merged_again.bed" #transcripts with Ns not removed
-#genome_input = "/mnt/shared/projects/barley/201903_RTD2/BarkeAssembly/180903_Barke_Unfiltered_chloro_clean_pseudomolecules_v1.fasta"
-#polyainput = "all_collapsed_polya.txt"
-#single_exon_input = "all_single_exon_reads2.txt"
-#short_read_input="all_spliceJns_from_gtfStringtieMerge_Stringtie_.tab"
-#short_read_input = "all_short_sjs.tab"#STAR splice junction output
-#outputfile_prefix = "20_samples_NoNs_sj_st_end_20_60_binomial_simple_method6_multi_map_fix"
-
-
-#hammingthreshold = 1 #For RT switching,threshold hamming distance below which sj considered RT switching. FOr example 2 means a difference of 2 bases in 8. Suggested:2
-#polyathreshold = 80 # threshold for As at 3' end of gene, above which read is removed
-#startwindow = 20 #Size of the window for removing unsupported 5' (+/- n)
-#endwindow = 60  #Size of the window for removing unsupported 3' (+/- n)
 splicejunctionfilter = True
 transcript_start_end_filter = True
 lowexpressedgene_rescue_most_sjs = False #As above, but just rescues the longest transcripts with the most sjs
