@@ -132,12 +132,12 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
     -i                       splice junction table
     -bed                     merged transcriptome .bed file without N containing transcripts (Optional)
     -bedn                    merged transcriptome .bed file
-    -sr                      Short read input (Optional). Splice junction output from STAR mapping of short reads. Currently only works with Barke genome
+    -sr                      Short read input (Optional). Splice junction output from STAR mapping of short reads.
     -g                       Genome reference
     -pA                      poly(A) information collated from tama collapse
     -s                       single exon input
     -o                       output prefix
-    --shortread_split        In BaRTv2, short reads were aligned to a genome with split chromosomes (the long reads were aligned to whole chromosomes. If this is       not the case include this option with <False>. This is optional, but is True by default (will assume reads were aligned to split genome). 
+    --shortread_split        Whether short reads for splcie junctions were aligned to a split genome. This is optional, but is True by default (will assume reads were aligned to split genome). Otherwise include as False.
     --hamming                For template switching,threshold hamming distance below which sj considered RT switching. FOr example 2 means a difference of 2 bases in 8 (default = 1)
     --polyA                  Threshold for percentage of As at 3' end of gene, above which read is removed (default = 80)
     --st_window              Size of the window for removing unsupported 5' ends (+/- n), (default = 20)
@@ -157,7 +157,7 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   
   **-bed merge_noNs.bed** This is an optional argument. With the barley genome there are stretches of Ns caused by gaps in the genome. When reads overlap these regions this can cause downstream annotation problems. It is best to remove all reads overlapping Ns (using bedtools intersect) and use the resulting filtered bed file as an input here. PLEASE NOTE: You still need the original unfiltered merged transcriptome from tama merge as input if you have a file as input here.
   
-  **-sr all_short_sjs.tab** This is an optional argument. This allows splice junctions from short reads to be used to support long read based splice junctions. Currently only works for the barley cv. Barke genome.
+  **-sr all_short_sjs.tab** This is an optional argument. This allows splice junctions from short reads to be used to support long read based splice junctions. In most cases you will need to set --shortread_split to False (see explanation of this argument).
   
   **-g genome.fasta** The genome reference file used for mapping of Iso-Seq.
   
@@ -166,6 +166,8 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   **-s all_single_exon_reads.txt** The collated single exon reads file from **BaRT_generate_filter_information.py**. This provides information on reads without splice junctions.
   
   **-o output_prefix** This is the prefix used in outfiles
+  
+  **--shortread_split** In BaRTv2, short reads were aligned to a genome with split chromosomes (the long reads were aligned to whole chromosomes). This was done due to problems with visualising short reads on large chromosomes. If this is not the case include this option with <False>. This is optional, but is True by default (will assume reads were aligned to split genome). If you did align short reads to a split genome, you will need to change the conversiondict variable at the top of the script. It will assume the names of your split chromosomes are chr1_part1, chr1_part2 etc.
   
 #### Outputs
 
