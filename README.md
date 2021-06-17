@@ -20,7 +20,7 @@ Both scripts for filtering Iso-seq require python >= 3.6. They also require the 
 
 ### BaRT_generate_filter_information.py
 
-This is the first module that needs to be run. It needs to be run on each sample seperately, and produces the inputs required for **BaRT_2_filter_binomial.py**. 
+This is the first module that needs to be run. It needs to be run on each Iso-seq library seperately, and produces the inputs required for **BaRT_2_filter_binomial.py**. Before running, you will need to run Tama collapse and Tama merge (see https://github.com/GenomeRIK/tama).
 
 The program takes various tama collapse output files (<prefix>_local_density_error.txt, <prefix>_trans_read.bed, <prefix>_collapsed.bed) and parses information to generate information on transcript coordinates, read coordinates, which reads support which transcripts and splice junction information, including types of errors sorrounding splice junctions. These are then written into output tables that can be used by **BaRT_2_filter_binomial.py**.
 
