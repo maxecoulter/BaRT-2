@@ -70,7 +70,7 @@ Where:
   
   2. **\<prefix>\_single_exon_reads.txt**
   
-  This is a tab delimited text file in this format:
+  This is a dataset of all the reads without splice junctions. It is a tab delimited text file in this format:
   
     m54203_191129_023846/5243497/ccs	G8.1	chr1H	205480	206287	-
     m54203_191129_023846/53609273/ccs	G26.40 chr1H	2898678	2898891	+
@@ -92,7 +92,7 @@ Where:
   
   e) Read map position (end)
     
-  This is a dataset of all the reads without splice junctions.
+  
   
   3. **\<prefix>\_Ide_read_errors**
   
