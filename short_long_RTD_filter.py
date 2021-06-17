@@ -1,23 +1,8 @@
 
-#Notes on merge_merge format:
-#Column 3 (0 based) merged transcript name ; input transcript name (which can be got by line[3].split(";")[1].split("_")[-1]
-#chr1H   72168   73280   G1.1;Splicejunction/20_samples_NoNs_sj_st_end_18_52_newmethod4_correctedp_lowexpressedgene_rescuemostsjs_merged_filtered.bed_G1.20	40      +       72168   73280   255,0,0 1       1112    0
-
-#gene as key, with transcript objects as set
-#each transcript object should have atributes: how many transcripts support transcript, and from long, short, or both
-#Need to find out for each gene whether it has transcripts from, long, short or both
-#If it has mutliple long read based transcripts, discard short read transcripts
-#If it only has short read transcripts, keep.
-# If it only has 1 long read transcript, check if gene is in low confidence list
-
-#So first parse merge_merged file (bed112 format)
 import argparse
 import statistics
-low_confidence_coverage_threshold = 0.8
-#merge_input = "/mnt/shared/scratch/mc42302/201903_RTD2/merged_RTD/merged_BaRT_merge.txt" #The merge_merge info fle
-#low_confidence_gene_list = "/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/Splicejunction/20_samples_NoNs_sj_st_end_18_52_newmethod4_correctedp_lowexpressedgene_rescuemostsjs_test_low_confidence_genes.txt"
-#bed_input = "/mnt/shared/scratch/mc42302/201903_RTD2/merged_RTD/merged_BaRT.bed" #The tanscriptome to be filtered
-#output = "/mnt/shared/scratch/mc42302/201903_RTD2/merged_RTD/merged_BaRT_filtered.bed"
+low_confidence_coverage_threshold = 0.8 #Iso-seq transcripts without end support will be kept if a certain length relative to average Illumina transcript. Default is 0.8 (80% of mean Illumina length)
+
 
 
 class Bedline:
@@ -83,7 +68,7 @@ class Gtfline:
 			self.length_dict.setdefault(self.transcript_id,[]).append(self.end - self.start)
 
 
-#gtfinput = "/mnt/shared/scratch/je42879/BaRTD_03July20_annotation_only/BaRT_July20_TS_transfix.gtf"
+
 
 
 
@@ -149,44 +134,10 @@ def filter_transcripts(gene_dict,low_confidence_coverage_threshold,monoexon,illu
 		else:# No pacbio transcripts, just add short read transcripts
 			for transcript_object in gene_dict[gene][1]:
 				hc_transcript_set.add(transcript_object.transcript)
-				#if set([transcript_object.exon_no for transcript_object in gene_dict[gene][1]]) == {1}:
-					#if transcript_object.source_transcript in illumina_coding_transcripts:
-						#CDS_lengths.append(max(list(length_dict[transcript_object.source_transcript])))
-						#if max(list(length_dict[transcript_object.source_transcript])) == 89:
-							#print(transcript_object.source_transcript)
-						#print(f'Mono-exon coding transcript identified: {transcript_object.transcript}')
-						#hc_transcript_set.add(transcript_object.transcript)
-					#else:
-						#removed_illumina.add(transcript_object.transcript)
-				#else:
-					#hc_transcript_set.add(transcript_object.transcript)
-	#print(f'Minimum monoexon CDS Illumina transcript length: {min(CDS_lengths)}')
+				
 	return hc_transcript_set, removed_illumina, removed_pacbio, kept_low_confidence
 
 
-
-"""
-if len(gene_dict[gene][0]) > 1:#First scenario:If more than 1 Pacbio transcript, remove short reads, except if low confidence
-	for transcript_object in gene_dict[gene][0]:
-		hc_transcript_set.add(transcript_object.transcript)#Just add pacbio transcripts, don't add short read ones
-	
-elif len(gene_dict[gene][0]) == 0: #Second scenario: No Pacbio transcripts in gene. In this case, just use short read transcripts
-	for transcript_object in gene_dict[gene][1]:
-		hc_transcript_set.add(transcript_object.transcript)
-elif len(gene_dict[gene][0]) == 1 and len(gene_dict[gene][1]) > 0: #Third scenario: 1 pacbio transcript, multiple short read transcripts
-	source_gene = gene_dict[gene][0][0].source_transcript.split(".")[0] #The gene that the pacbio transcript originally came from
-	for transcript_object in gene_dict[gene][1]:
-		if set(transcript_object.sjcoordinates()) <= set(gene_dict[gene][0][0].sjcoordinates()): #See if every sj in short read transcript is in long read transcript
-			hc_transcript_set.add(transcript_object.transcript)
-	if source_gene not in low_confidence_genes: #If True, this is a gene that did not have good start/end support in pacbio data
-		hc_transcript_set.add(gene_dict[gene][0][0].transcript)
-elif len(gene_dict[gene][0]) == 1 and len(gene_dict[gene][1]) == 0: #Just 1 pacbio transcript
-	hc_transcript_set.add(gene_dict[gene][0][0].transcript)
-else:#There may be other criteria that need to be considered.
-	print("Gene " + gene + " does not fit any criteria and so will be removed")"""
-
-#def parse_low_confidence_genes(low_confidence_gene_list):
-	#return set(open(low_confidence_gene_list).read().split("\n")[:-1])
 
 def get_Illumina_coding_transcripts(gtfinput):
 	for line in open(gtfinput):
@@ -221,10 +172,7 @@ def main():
 	print("Parsing merge file...")
 	gene_dict = {}
 	iso_sjs = set()
-	#Extract information from merge_merge file
-	#mergeinput_corrected = open(args.merge_input).read().replace("\n_","M").split("\n")[:-1]
-	#print(args.merge_input)
-	#print(open(args.merge_input).readlines()[0])
+	
 	for n,line in enumerate(open(args.merge_input)):
 		#print(str(n))
 		#print(line)
