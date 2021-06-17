@@ -28,6 +28,7 @@ The program takes various tama collapse output files (<prefix>_local_density_err
 Usage: python BaRT_generate_filter_information.py input genome file
   
 **input** The path to the folder where tama collapse output is, and the file prefix used by tama, e.g /path/to/sample_folder/prefix
+
 **genome file** The path and fasta file of reference genome. e.g /path/to/genome.fasta
 
 #### Output
