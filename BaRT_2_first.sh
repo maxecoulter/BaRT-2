@@ -13,10 +13,11 @@
 
 
 #Find all isoseq subread files, create folders for results if needed
-#find . -name "*m*.subreads.bam" > readfile
 
-#find . -name "m54203_191120_152842.subreads.bam" > readfile
-#find . -name "m54203_191121_114918.subreads.bam" >> readfile
+#First get list of all raw iso-seq subread files
+find . -name "*m*.subreads.bam" > readfile
+
+#Create a folder for each sample named after the sample
 find . -wholename "./*/*/*/*/*/*/*/m*.subreads.bam" > extrafolders
 for i in `cat extrafolders`
 do
@@ -25,35 +26,22 @@ FName2=${FName%%.*};#bam file name
 mkdir $FName2
 done
 
-#for i in `cat readfile`
-#do
-#FName=${i##*/};#<bam file name>.bam
-#FName2=${FName%%.*};#bam file name
-#mkdir $FName2
-#done
 
 
-#for i in `cat readfile` 
-#do
-
+#Get the sample to work on, and move it into its directory
 INFILE=`awk "NR==$SGE_TASK_ID" readfile`
-#INFILE=./m54203_190507_063222/m54203_190507_063222.subreads.bam
+
 FName=${INFILE##*/};#<bam file name>.bam
 FName1=${INFILE##./};#bam input (*/<bam file name>.bam
 FName2=${FName%%.*};#bam file name
 bamdirectory=/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/$FName1
-#mv $INFILE ${FName2}/
-#FName=${i%/*};#./<bam file name>
-#FName1=${i##*/};#bam input (<bam file name>.bam
-#FName2=${FName1%%.*};#bam file name 
+mv $INFILE ${FName2}/
 
-#mv $i ${FName2}/ #Move .bam file to 
 
+
+#Begin work...
 cd ${FName2}/
 
-
-
-#mkdir ${FName2}
 
 echo "working on ccs for" $FName2
 #conda activate isoseqold
