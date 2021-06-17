@@ -12,7 +12,7 @@ The filtering is based on the output from TAMA collapse and TAMA merge (https://
 The filtering of the Iso-Seq has two modules: **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**.
 
 ### Dependencies:
-- Both scripts for filtering Iso-seq require python >= 3.6
+Both scripts for filtering Iso-seq require python >= 3.6. They also require the following:
 - Pandas
 - Plotnine
 - matplotlib
