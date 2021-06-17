@@ -5,7 +5,13 @@ Author: Max Coulter
 
 Contact: mecoulter@dundee.ac.uk
 
-These scripts were used for filtering the deep Iso-Seq data for construction of BaRTv2.0,  a barley cv. Barke reference transcriptome. Below is a brief description of how these scripts can be run. A detailed explanation of the methodology used in the scripts is described in the BaRTv2.0 paper (Coulter et al., unpublished).
+These scripts were used for filtering the deep Iso-Seq data for construction of BaRTv2.0,  a barley cv. Barke reference transcriptome. Below is a brief description of how these scripts can be run. A detailed explanation of the methodology used in the scripts and the workflow is described in the BaRTv2.0 paper (Coulter et al., unpublished).
+
+Two scripts, **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py** are designed to be run on any pacbio dataset with correct input files.
+
+The others scripts were used specifically for analysing pacbio data for the BaRTv2 transcriptome. I will explain what they do but they won't work out of the box and will require adjusting. 
+
+## Filtering of Iso-seq data using **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**
 
 The filtering is based on the output from TAMA collapse and TAMA merge (https://github.com/GenomeRIK/tama/wiki), a program used to create gene and transcript coordinates from Iso-Seq mappings. The outputs from these programs are required for running of filtering.
 
@@ -210,6 +216,20 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   g) Column 7, True or False, whether transcript has support for 3' end, either by multiple reads within a window or by a high confidence TES site;
   
   h) Column 8, True or False, whether transcript has support from high confidence splice junctions. If all transcript splice junctions are present in the high confidence set of splice junctions, this will be True
+  
+  ## Other scripts
+  
+  A number of other scripts were used to create BaRTv2:
+  
+  ### BaRT_2_first.sh 
+  
+  This script takes you from raw iso-seq, through mapping, to tama collapse for each sample, and gets stats on Iso-seq reads. 
+  It will generate nearly all the input required for **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**, 
+  though you will also need to run BaRT_2_first_merge.sh. 
+  
+  
+  
+  
   
   
   
