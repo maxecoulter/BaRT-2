@@ -129,20 +129,20 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
 
 **Optional arguments:**
 
-    -i                 splice junction table
-    -bed               merged transcriptome .bed file without N containing transcripts (Optional)
-    -bedn              merged transcriptome .bed file
-    -sr                Short read input (Optional). Splice junction output from STAR mapping of short reads. Currently only works with Barke genome
-    -g                 Genome reference
-    -pA                poly(A) information collated from tama collapse
-    -s                 single exon input
-    -o                 output prefix
-    --shortread_split  In BaRTv2, short reads were aligned to a genome with split chromosomes (the long reads were aligned to whole chromosomes. If this is                        not the case include this option with <False>. This is optional, but is True by default (will assume reads were aligned to split                            genome). 
-    --hamming          For template switching,threshold hamming distance below which sj considered RT switching. FOr example 2 means a difference of 2 bases in 8 (default = 1)
-    --polyA            Threshold for percentage of As at 3' end of gene, above which read is removed (default = 80)
-    --st_window        Size of the window for removing unsupported 5' ends (+/- n), (default = 20)
-    --end_window       Size of the window for removing unsupported 3' ends (+/- n), (default = 60)
-    --min_short_readsupport Minimum read support for short read splice junction. (Default = 5)
+    -i                       splice junction table
+    -bed                     merged transcriptome .bed file without N containing transcripts (Optional)
+    -bedn                    merged transcriptome .bed file
+    -sr                      Short read input (Optional). Splice junction output from STAR mapping of short reads. Currently only works with Barke genome
+    -g                       Genome reference
+    -pA                      poly(A) information collated from tama collapse
+    -s                       single exon input
+    -o                       output prefix
+    --shortread_split        In BaRTv2, short reads were aligned to a genome with split chromosomes (the long reads were aligned to whole chromosomes. If this is       not the case include this option with <False>. This is optional, but is True by default (will assume reads were aligned to split genome). 
+    --hamming                For template switching,threshold hamming distance below which sj considered RT switching. FOr example 2 means a difference of 2 bases in 8 (default = 1)
+    --polyA                  Threshold for percentage of As at 3' end of gene, above which read is removed (default = 80)
+    --st_window              Size of the window for removing unsupported 5' ends (+/- n), (default = 20)
+    --end_window             Size of the window for removing unsupported 3' ends (+/- n), (default = 60)
+    --min_short_readsupport  Minimum read support for short read splice junction. (Default = 5)
     --min_short_readoverhang Minimum overhang for short read splice junction. (Default = 10)
     
   Default usage would look like this:
