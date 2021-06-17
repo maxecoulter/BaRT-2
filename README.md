@@ -59,7 +59,7 @@ Where:
 
   d) Column 4, splice junction error profile +/- 30 bp either side of the splice junction. The > symbol represents the location of the splice junction, with various characters indicating errors (for further details see **prefix_local_density_error.txt** output information in  https://github.com/GenomeRIK/tama/wiki/Tama-Collapse;
   
-  e) Column 5, unique splice junction location id, in format \<chromosome>\_<start>\_<end>_\<strand>\;
+  e) Column 5, unique splice junction location id, in format \<chromosome>_<start>\_<end>_\<strand>\;
   
   f) Column 6, The donor and acceptor dinucleotides for the splice junction;
   
