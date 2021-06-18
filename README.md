@@ -35,11 +35,11 @@ This is the first module that needs to be run. It needs to be run on each Iso-se
 The program takes various tama collapse output files (<prefix>_local_density_error.txt, <prefix>_trans_read.bed, <prefix>_collapsed.bed) and parses information to generate information on transcript coordinates, read coordinates, which reads support which transcripts and splice junction information, including types of errors sorrounding splice junctions. These are then written into output tables that can be used by **BaRT_2_filter_binomial.py**.
 
 #### Usage
-Usage: python BaRT_generate_filter_information.py input genome file
+Usage: python BaRT_generate_filter_information.py input genome_fasta
   
 **input** The path to the folder where tama collapse output is, and the file prefix used by tama, e.g /path/to/sample_folder/prefix
 
-**genome file** The path and fasta file of reference genome. e.g /path/to/genome.fasta
+**genome_fasta** The path and fasta file of reference genome. e.g /path/to/genome.fasta
 
 #### Output
 
