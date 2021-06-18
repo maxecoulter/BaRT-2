@@ -259,7 +259,7 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   
   ### BaRT_merge.sh
   
-  Once the Iso-seq based trnascriptome has been filtered and the complexity reduced, it can be merged with a short read transcriptome. The goal is to keep the Iso-seq trnascripts, and use the Illumina short read based transcriptome to plug gaps in the coverage. The script uses tama merge to combine short and long read transcriptomes, and **short_long_RTD_filter.py** to filter the resulting transcriptome. 
+  Once the Iso-seq based transcriptome has been filtered and the complexity reduced, it can be merged with a short read transcriptome. The goal is to keep the Iso-seq trnascripts, and use the Illumina short read based transcriptome to plug gaps in the coverage. The script uses tama merge to combine short and long read transcriptomes, and **short_long_RTD_filter.py** to filter the resulting transcriptome. 
   
   #### Dependencies:
   
@@ -269,7 +269,7 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   
   ### short_long_RTD_filter.py
   
-  Script for filtering the combined short long read transcriptome. Context for usage found in **BaRT_merge.sh**. Will remove short read only based transcripts unless they cover novel splice junctions or novel genomic loci.
+  Script for filtering the combined short long read transcriptome. The context for its usage is found in **BaRT_merge.sh**. Will remove short read only based transcripts unless they cover novel splice junctions or novel genomic loci.
   
   ### convert_bed_to_split_chromosomes.py
   
