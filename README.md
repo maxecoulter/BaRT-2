@@ -1,6 +1,5 @@
 # BaRTv2.0
 
-## Overview
 
 Authors: Max Coulter, Runxuan Zhang, John Brown
 
@@ -14,12 +13,6 @@ The others scripts were used specifically for analysing pacbio data for the BaRT
 
 All python scripts (except those associated with tama) require python >= 3.6.
 
-* [Overview](#overview)
-* [Filtering of Iso-seq data using **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py](#Filtering of Iso-seq data using **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py)
-    * [BaRT_generate_filter_information.py](#BaRT_generate_filter_information.py)
-    * [BaRT_2_filter_binomial.py](#BaRT_2_filter_binomial.py)
-* [Other scripts](#Other scripts)
-  
 
 ## Filtering of Iso-seq data using **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**
 
