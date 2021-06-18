@@ -1,7 +1,7 @@
 # BaRTv2.0
 
 
-Author: Max Coulter
+Authors: Max Coulter, Runxuan Zhang, John Brown
 
 Contact: mecoulter@dundee.ac.uk
 
