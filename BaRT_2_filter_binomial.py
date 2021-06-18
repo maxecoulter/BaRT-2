@@ -7,17 +7,11 @@ For creating RTD based on Iso-Seq and Illumina data, using output from TAMA
 
 import time
 import sys
-import os
-import logging
-import re
 import math
-from operator import add
-from itertools import repeat
-import matplotlib
+from operator import neg
 import pandas as pd
-import numpy
-from plotnine import *
 
+from plotnine import *
 #For venn diagram
 from matplotlib import pyplot as plt
 from matplotlib_venn import venn3, venn3_circles
@@ -31,11 +25,10 @@ import scipy.stats as stats
 from scipy.stats import fisher_exact as fishers_exact_test
 
 
-start1 = time.time()
-
 conversiondict = {"chr1H":205415724,"chr2H":295953730,"chr3H":267034671,"chr4H":273224149,"chr5H":209770093,"chr6H":246027230,"chr7H":316571039}#For converting split Barke file to whole
-readsupportcutoff = 5 #Min read support for splice junction
-min_overhang = 10 #min overhang for splice junction
+
+
+
 
 
 splicejunctionfilter = True
@@ -566,9 +559,6 @@ def five_prime_support_hunter2(start,startwindow,startsdict,highexpressed):
 				return True
 	return False
 
-
-#New 02/06/20
-
 def furthest_end2(gene_transcripts,transcripts):#Finds transcript with most proximal 3' start
 	firstend = -1
 	for t in gene_transcripts:
@@ -586,7 +576,6 @@ def furthest_end2(gene_transcripts,transcripts):#Finds transcript with most prox
 			pass
 	return furthest_end_transcript
 
-#New 3/6/20
 def furthest_start2(gene_transcripts,transcripts):#gene_class_dict,transcript_class_dict):
 	firststart = -1
 	for t in gene_transcripts:
@@ -615,7 +604,7 @@ def hamming_distance(s1, s2):
 	assert len(s1) == len(s2)
 	return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
-def histogram_from_list(list1,no_breaks,filename,x_axis_title,colour): #Takes list of floats, creates histogram. Way better then numpy.histogram!
+def histogram_from_list(list1,no_breaks,filename,x_axis_title,colour): #Takes list of floats, creates histogram.
 	maximum = max(list1)
 	range1 = maximum
 	breaksize = range1/no_breaks
@@ -634,21 +623,10 @@ def histogram_from_list(list1,no_breaks,filename,x_axis_title,colour): #Takes li
 				pass
 	bar_plot(histo,filename,x_axis_title,"frequency",colour,False)
 
-def inv(t):
-	if t < 0:
-		n = abs(t)
-	elif t > 0:
-		n =- t
-	elif t == 0:
-		n = t
-	else:
-		print("inverse error!")
-	return n
-
 def in_window(first_start,second_start,windowsize):
 	difference = first_start - second_start
 	if difference < 0:
-		difference = inv(difference)
+		difference = neg(difference)
 	return difference <= windowsize
 
 def is_proximal(starttest,total_maxstartposition_dict,strand):
@@ -674,18 +652,6 @@ def parse_bed_input(bedinput,t_read_dict,reads,all_matched_reads,transcript_no_r
 		#print(line)
 		bed = Bedline(line) #create object bed of class Bedline
 		t_readkey = bed.chromosome + "_" + str(bed.start + 1) + "_" + str(bed.end + 1) + "_" + "_".join(sorted(bed.sjcoordinates()))
-		if bed.transcript == "G68.264":
-			print(line)
-			print(t_readkey)
-			print(str(t_readkey in t_read_dict.keys()))
-			if "m54203_180927_185924/51511488/ccs" in reads.Instances.keys():
-				read = reads.get("m54203_180927_185924/51511488/ccs")
-				print(str(read.start))
-				print(str(read.end))
-				print(str(read.sjs))
-			else:
-				print("Error! Read m54203_180927_185924/51511488/ccs not in read Instances")
-			#sys.exit()
 		try:
 			read_list = t_read_dict[t_readkey]#Extracted readlist is set
 			transcripts = Transcripts(bed,read_list)
@@ -703,15 +669,16 @@ def parse_bed_input(bedinput,t_read_dict,reads,all_matched_reads,transcript_no_r
 	return genes, transcripts
 
 def parse_genome(genome_input):
-	genome = open(genome_input).read().replace("\n","")
-	#Split genome into chromosome dictionary with key = chr id and item chromosome sequence
+	genome = open(genome_input).read()
+	#Split genome into chromosome dictionary with key = chr id and value chromosome sequence
 	chromosomes = genome.split(">")
 	del chromosomes[0]
 	chromosomedict = {}
 	for chromosome in chromosomes:
-		chromid=chromosome[0:5]
-		chromsequence=chromosome[5:]
-		chromosomedict[chromid]=chromsequence #Genome sequence now in dictionary with chromosomes as key
+		chromosomesplit = chromosome.split("\n")
+		chromid = chromosomesplit[0]
+		chromsequence = "".join(chromosomesplit[1:])
+		chromosomedict[chromid] = chromsequence #Genome sequence now in dictionary with chromosomes as key
 	return chromosomedict
 
 def parse_polyA(input_file,polyathreshold):
@@ -728,20 +695,24 @@ def parse_polyA(input_file,polyathreshold):
 				pass
 	return polyareaddict
 
-def parse_short_read_STAR(input1,conversiondict,readsupportcutoff,min_overhang):
+def parse_short_read_STAR(input1,conversiondict,readsupportcutoff,min_overhang,convertsplit):
 	short_read_sj = set()
 	for line in open(input1):
 		line1 = line.strip("\n").split("\t")
 		#Convert split chromosomes to whole chromosomes
 		chromosome = line1[0].split("_")
 		chrom = chromosome[0]
-		if chromosome[-1] == "2":
-			start = conversiondict[chrom] + int(line1[1])
-			end = conversiondict[chrom] + int(line1[2])
-		elif chromosome[-1] == "1":
-			start = int(line1[1])
-			end = int(line1[2])
-		else:#Chromosome Un
+		if convertsplit:
+			if chromosome[-1] == "2":
+				start = conversiondict[chrom] + int(line1[1])
+				end = conversiondict[chrom] + int(line1[2])
+			elif chromosome[-1] == "1":
+				start = int(line1[1])
+				end = int(line1[2])
+			else:#Chromosome Un
+				start = int(line1[1])
+				end = int(line1[2])
+		else:
 			start = int(line1[1])
 			end = int(line1[2])
 		strand = line1[3]
@@ -914,8 +885,7 @@ def write_outputs(path,path2,outputfile_prefix,lowconfidence_genes,tama_merge_in
 	filelist=open(path2 + "file_list_filtered.txt","w")#Input for tama merge
 	filelist.write(tama_merge_input + "\t" + "capped" + "\t" + "1,1,1" + "\t" + tama_merge_input + "\n")
 	filelist.close()
-	##Print number of transcripts in, number out and number removed, same with genes
-	#print ('{:,}'.format(value))
+	
 	reportout.write("Total number of reads in input: " + '{:,}'.format(len(reads.Instances.keys())) + "\n")
 	reportout.write(f"Longest mapped read length: {max(allreadlengths)}")
 	reportout.write("Total number of trancripts in input: " + '{:,}'.format(len(fulltranscriptlist)) + "\n")
@@ -932,8 +902,7 @@ def write_outputs(path,path2,outputfile_prefix,lowconfidence_genes,tama_merge_in
 	reportout.write("Total number of low confidence splice junctions (removed) sequence error: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["error"]])) + "\n")
 	reportout.write("Total number of low confidence splice junctions (removed) potential template switch: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["RT switch"]])) + "\n")
 	
-	#reportout.write("Total number of low confidence genes recued by short read splice junctions: " + str(len(gene_rescue_set_again)))
-	#print("Number of transcripts with single exon removed: "+'{:,}'.format(len(single_exon_transcripts_low_read)))
+	
 	reportout.close()
 	starts_out = open(path2 + "TSS_information.txt","w")#Columns: gene, TSS start pos, read support, p value
 	ends_out = open(path2 + "TES_information.txt","w")#Columns: gene, TES start pos, read support, p value
@@ -958,35 +927,43 @@ def write_outputs(path,path2,outputfile_prefix,lowconfidence_genes,tama_merge_in
 	
 
 
-
-#Input - Combined file of all samples with following columns:#Order: readid,transid,sjno,error_profile,sj_coordinates,sj_sequence
-
 def main():
 	#Parse arguments
 	parser = argparse.ArgumentParser(description='Filtering of Iso-Seq based bed file using high confidence sjs and TSS/TES sites. Outputs a filtered bed file as well as other figures')
 	parser.add_argument('-i', dest = 'infile', type = str, help = 'Splice junction table produced by generate_filter_information.py. Include full path')
-	parser.add_argument('-bed', dest = 'bedinput', type = str, help = 'Tama merge output bedfile (with transcripts overlapping Ns removed). Include full path', default = "")
+	parser.add_argument('-bed', dest = 'bedinput', type = str, help = 'Tama merge output bedfile (with transcripts overlapping Ns removed). Optional. Include full path', default = "")
 	parser.add_argument('-bedn', dest = 'bedinput2', type = str, help = 'Tama merge output bedfile (before N removal).If N removal not required put bedinput here. Include full path')
-	parser.add_argument('-sr', dest = 'short_read_input', type = str, help = 'STAR input of short read sjs')
-	
+	parser.add_argument('-sr', dest = 'short_read_input', type = str, help = 'STAR input of short read sjs (Optional). Currently set up with short read alignments done to a split genome (see conversiondict at top of script. This can be adjusted to suit any split genome. If you aligned short reads to a normal whole chromosome genome, just set --shortread_split to False.',default = '')
+	parser.add_argument('--shortread_split', dest = 'convertsplit', type = str, help = "In BaRTv2, short reads were aligned to a genome with split chromosomes (the long reads were aligned to whole chromosomes. If this is not the case include this option with <False>. This is optional, but is True by default (will assume reads were aligned to split genome).", default = 'True')
 	parser.add_argument('-g', dest = 'genome_input', type = str, help = 'Genome used for mapping')
 	parser.add_argument('-pA', dest = 'polyainput', type = str, help = 'PolyA input from tama collapse')
 	parser.add_argument('-s', dest = 'single_exon_input', type = str, help = 'Single exon input file from generate_filter_information.py')
 	parser.add_argument('-o', dest = 'outputfile_prefix', type = str, help = 'Prefix to be used in outputs')
-	parser.add_argument('--hamming', dest = 'hammingthreshold', type = int, help = 'For template switching,threshold hamming distance below which sj considered RT switching. FOr example 2 means a difference of 2 bases in 8. Default = 1', default = 1)
-	parser.add_argument('--polyA', dest = 'polyathreshold', type = int, help = "threshold for percentage of As at 3' end of gene, above which read is removed", default = 80)
-	parser.add_argument('--st_window', dest = 'startwindow', type = int, help = "Size of the window for removing unsupported 5' (+/- n)", default = 20)
-	parser.add_argument('--end_window', dest = 'endwindow', type = int, help = "Size of the window for removing unsupported 3' (+/- n)", default = 60)
+	parser.add_argument('--hamming', dest = 'hammingthreshold', type = int, help = 'For template switching,threshold hamming distance below which sj considered RT switching. For example 2 means a difference of 2 bases in 8. Default = 1', default = 1)
+	parser.add_argument('--polyA', dest = 'polyathreshold', type = int, help = "threshold for percentage of As at 3' end of gene, above which read is removed. Default is 80.", default = 80)
+	parser.add_argument('--st_window', dest = 'startwindow', type = int, help = "Size of the window for removing unsupported 5' (+/- n). Default is 20.", default = 20)
+	parser.add_argument('--end_window', dest = 'endwindow', type = int, help = "Size of the window for removing unsupported 3' (+/- n). Default is 60.", default = 60)
+	parser.add_argument('--min_short_readsupport', dest = 'readsupportcutoff', type = int, help = "Minimum read support for short read splice junction. Default is 5.", default = 5)
+	parser.add_argument('--min_short_readoverhang', dest = 'min_overhang', type = int, help = "Minimum overhang for short read splice junction. Default is 10.", default = 10)
 	args = parser.parse_args()
 	path = "/".join(args.infile.split("/")[:-1]) + "/"
-	#path = "/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/Splicejunction/"#Path to where input files are kept (except tama merge outputs and inputs)
 	path2 = "/".join(args.bedinput2.split("/")[:-1]) + "/"
-	#path2 = "/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/"
+
+	#Convert convertsplit to boolean
+	if args.convertsplit == 'False':
+		convertsplit = False
+	else:
+		convertsplit = True
+	
+	
+
 	tama_merge_input = path + args.outputfile_prefix + "_merged_filtered.bed"
 	if not args.bedinput:
 		bedinput = args.bedinput2
 	else:
 		bedinput = args.bedinput
+	######
+
 	start1 = time.time()
 	print("parsing input file")
 	reads, splice_junctions = parse_sj_table(args.infile)
@@ -995,10 +972,10 @@ def main():
 	print("Parsing single exon input file")
 	reads = single_exon_parser(args.single_exon_input)
 
+
 	print("Finding reads for merged transcripts...")
-	#t_read_dict = {}#chromosome[0], start[1], end[2], set of sjs[3]seperated by "_" is key, set of reads is item
 	t_read_dict = generate_t_read_dict(reads)
-	##
+	
 	print("Matching transcripts to reads...")
 	all_matched_reads = set()
 	transcript_no_read_support = set()
@@ -1025,7 +1002,7 @@ def main():
 		allreadlengths += [transcript.total_length] * len(transcript.reads)
 
 	histogram_from_list(allreadlengths,50,"histogram_of_mapped_readlengths_breaks50","Read length","blue")
-	#Problem idenfified: Genes with transcripts removed can have scewed fragment profiles. These transcripts have been rmeoved due to overlap with Ns. Therefore find these transcripts. Then remove these genes
+	#Problem identified: Genes with transcripts removed can have scewed fragment profiles. These transcripts have been rmeoved due to overlap with Ns. Therefore find these transcripts. Then remove these genes
 	bedlines = set(open(bedinput).readlines())
 	bedlines2 = set(open(args.bedinput2).readlines()) #This bedfile has transcripts overlapping polyNs
 
@@ -1037,7 +1014,7 @@ def main():
 		else:
 			pass
 	genes, transcripts = parse_bed_input(bedlines_overlapNs,t_read_dict,reads,all_matched_reads,transcript_no_read_support,matched_coordinates,notmatched_coordinates,True)
-	not_matched_read_co = t_read_dict.keys() - matched_coordinates
+	
 	print("transcripts no read support " + str(len(transcript_no_read_support)))
 	reads_not_matched = reads.Instances.keys() - all_matched_reads
 	print("reads with no transcript support " + str(len(reads_not_matched)))
@@ -1065,14 +1042,7 @@ def main():
 
 	assert len(mid_genes) + len(trueTSS_dict2.keys()) + len(lowconfidence_genes) == len(genes.Instances.keys())
 
-	"""for gene in degredation_dict.keys():
-		self = Gene(gene)
-		degradation = degredation_dict[gene]
-		total_degradation += degradation * self.expression
-		total_reads += self.expression
-
-	print(str(total_degradation/total_reads))
-	#Degradation on 23/03/20 was 4.9 percent"""
+	
 
 	print("Parsing polyA input...")
 	#Aim: Remove transcripts with polyAs 20bp at 3' end of gene
@@ -1090,9 +1060,9 @@ def main():
 	short_read_sj = set()
 	if args.short_read_input:
 		###
-		short_read_sj = parse_short_read_STAR(args.short_read_input,conversiondict,readsupportcutoff,min_overhang)
+		short_read_sj = parse_short_read_STAR(args.short_read_input,conversiondict,args.readsupportcutoff,args.min_overhang,convertsplit)
 		#Check whether sjs match up
-	all_sj = set(all_good_sjs.keys())#Just use high confident sjs, 162756 30/12/19
+	all_sj = set(all_good_sjs.keys())#Just use high confident sjs
 		####
 	in_both = set()
 	for sj in short_read_sj:
