@@ -4,7 +4,6 @@ import pandas as pd
 from plotnine import *
 import argparse
 
-infile3 = "/mnt/shared/scratch/mc42302/201903_RTD2/Pacbio_20_samples/Splicejunction/20_samples_NoNs_sj_st_end_20_60_binomial_simple_lowexpressedgene_rescuemostsjs_method6_multi_map_fix_final_merge.bed"
 
 def bar_plot(input_dictionary,filename,x_axis_title,y_axis_title,bar_colour,axis_angle_90):#Creates barplot in ggplot style, from dictionary with keys as x axis and values as y axis
 	histokeys = list(input_dictionary.keys())
@@ -136,7 +135,7 @@ for gene in gene_transcript_dict_merged.keys():
 
 
 
-bar_plot(transcript_numbers,"/mnt/shared/scratch/mc42302/201903_RTD2/Figures/Num of transcripts per gene histogram" + args.output,"Number of transcripts per gene","Frequency","blue",False)
+bar_plot(transcript_numbers,"Num of transcripts per gene histogram" + args.output,"Number of transcripts per gene","Frequency","blue",False)
 
 
 
