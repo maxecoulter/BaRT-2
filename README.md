@@ -15,7 +15,9 @@ All python scripts (except those associated with tama) require python >= 3.6.
 
 ## Filtering of Iso-seq data using **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**
 
-The filtering is based on the output from tama collapse and tama merge (https://github.com/GenomeRIK/tama/wiki), a program used to create gene and transcript coordinates from Iso-Seq mappings. The outputs from these programs are required for running of filtering.
+The filtering is based on the output from tama collapse and tama merge (https://github.com/GenomeRIK/tama/wiki), a program used to create gene and transcript coordinates from Iso-Seq mappings. The outputs from these programs are required for running of filtering. 
+
+The scripts generate datasets of high confidence splice junctions and high confidence transcript start and end sites. These are used for the basis of filtering the .bed file. This will remove transcripts with low read support, or those that have poorly supported splice junctions, or poorly supported start or end sites. More detail on the algorithms can be found in the BaRTv2 paper.
 
 The filtering of the Iso-Seq has two modules: **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**.
 
