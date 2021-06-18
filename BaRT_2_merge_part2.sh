@@ -40,8 +40,6 @@ cut -f4 ${path2}/${prefix}_final_merge.bed  | awk '{split($1, a, ";");print a[2]
 cut -f4 ${path2}/${prefix}_final_merge.bed | awk '{split($1, a, ";");print a[1]}'| sort | uniq | wc -l
 cut -f4 ${path2}/${prefix}_final_merge.bed | awk '{split($1, a, ";");print a[2]}'| sort | uniq | wc -l
 
-###statisitics for barley cv. Morex 1 ONT sample
-## genes transcripts
 
 
 
