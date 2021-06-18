@@ -7,13 +7,15 @@ Contact: mecoulter@dundee.ac.uk
 
 These scripts were used for filtering the deep Iso-Seq data for construction of BaRTv2.0,  a barley cv. Barke reference transcriptome. Below is a brief description of how these scripts can be run. A detailed explanation of the methodology used in the scripts and the workflow is described in the BaRTv2.0 paper (Coulter et al., unpublished).
 
-Two scripts, **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py** are designed to be run on any pacbio dataset with correct input files.
+Two scripts, **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py** are designed to be run on any pacbio dataset with correct input files. Usage, input and output are explained in detail.
 
 The others scripts were used specifically for analysing pacbio data for the BaRTv2 transcriptome. I will explain what they do but they won't work out of the box and will require adjusting. 
 
+All python scripts (except those associated with tama) require python >= 3.6.
+
 ## Filtering of Iso-seq data using **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**
 
-The filtering is based on the output from TAMA collapse and TAMA merge (https://github.com/GenomeRIK/tama/wiki), a program used to create gene and transcript coordinates from Iso-Seq mappings. The outputs from these programs are required for running of filtering.
+The filtering is based on the output from tama collapse and tama merge (https://github.com/GenomeRIK/tama/wiki), a program used to create gene and transcript coordinates from Iso-Seq mappings. The outputs from these programs are required for running of filtering.
 
 The filtering of the Iso-Seq has two modules: **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**.
 
@@ -26,7 +28,7 @@ Both scripts for filtering Iso-seq require python >= 3.6. They also require the 
 
 ### BaRT_generate_filter_information.py
 
-This is the first module that needs to be run. It needs to be run on each Iso-seq library seperately, and produces the inputs required for **BaRT_2_filter_binomial.py**. Before running, you will need to run Tama collapse and Tama merge (see https://github.com/GenomeRIK/tama).
+This is the first module that needs to be run. It needs to be run on each Iso-seq library seperately, and produces the inputs required for **BaRT_2_filter_binomial.py**. Before running, you will need to run tama collapse and tama merge (see https://github.com/GenomeRIK/tama).
 
 The program takes various tama collapse output files (<prefix>_local_density_error.txt, <prefix>_trans_read.bed, <prefix>_collapsed.bed) and parses information to generate information on transcript coordinates, read coordinates, which reads support which transcripts and splice junction information, including types of errors sorrounding splice junctions. These are then written into output tables that can be used by **BaRT_2_filter_binomial.py**.
 
@@ -225,7 +227,65 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   
   This script takes you from raw iso-seq, through mapping, to tama collapse for each sample, and gets stats on Iso-seq reads. 
   It will generate nearly all the input required for **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**, 
-  though you will also need to run BaRT_2_first_merge.sh. 
+  though you will also need to run **BaRT_2_first_merge.sh**. 
+  
+  #### Dependencies:
+  
+   - Isoseq3
+  
+   - samtools 1.9
+  
+   - tama
+  
+   - Minimap2 2.17-r941
+  
+ 
+  
+  ### BaRT_2_first_merge.sh
+  
+  This script was used to run tama merge. This is done after tama collapse has been run, to combine annotations of multiple Iso-seq libraries. The resulting .bed file can be filtered based on concatonated read and splice junction information from tama collapse using **BaRT_2_filter_binomial.py**.
+ 
+  #### Dependencies:
+  
+   - tama
+  
+  ### BaRT_2_merge_part2.sh
+  
+  This script is run using the filtered .bed file from **BaRT_2_filter_binomial.py** as an input. Tama merge is used here to combine transcripts that have the same splice junctions but small differences in ends. This reduces the complexity of the Iso-seq based transcriptome removing differences between transcripts that are likely redundant.
+ 
+  #### Dependencies:
+  
+   - tama
+  
+  ### BaRT_merge.sh
+  
+  Once the Iso-seq based trnascriptome has been filtered and the complexity reduced, it can be merged with a short read transcriptome. The goal is to keep the Iso-seq trnascripts, and use the Illumina short read based transcriptome to plug gaps in the coverage. The script uses tama merge to combine short and long read transcriptomes, and **short_long_RTD_filter.py** to filter the resulting transcriptome. 
+  
+  #### Dependencies:
+  
+  - Tama
+  - seqkit 0.13.2
+  - bedtools v2.29.2
+  
+  ### short_long_RTD_filter.py
+  
+  Script for filtering the combined short long read transcriptome. Context for usage found in **BaRT_merge.sh**. Will remove short read only based transcripts unless they cover novel splice junctions or novel genomic loci.
+  
+  ### convert_bed_to_split_chromosomes.py
+  
+  Script for converting.bed file with whole chromosomes to .bed with split chromosomes. The coordinates for splitting chromosomes are found at the top of the script and can be adjusted.
+  
+ ### merge_file_analysis.py
+  
+  A script that produces useful summary statistics for bed file.
+  
+  #### Dependencies:
+  
+  - pandas
+  - plotnine
+  
+  
+  
   
   
   
