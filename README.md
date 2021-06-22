@@ -3,7 +3,6 @@
 
 Authors: Max Coulter, Runxuan Zhang, John Brown
 
-Contact: mecoulter@dundee.ac.uk
 
 These scripts were used for filtering the deep Iso-Seq data for construction of BaRTv2.0,  a barley cv. Barke reference transcriptome. Below is a brief description of how these scripts can be run. A detailed explanation of the methodology used in the scripts and the workflow is described in the BaRTv2.0 paper (Coulter et al., unpublished).
 
