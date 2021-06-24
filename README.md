@@ -286,6 +286,17 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   - pandas
   - plotnine
   
+ ### TSS_TES_analysis_BaRT.py 
+  
+  Script for looking at enrichment of motifs associated with TSS and TES at transcriptome 5' and 3' ends. Will produce figures. To use you will need to change the hard paths at the start.
+  
+  #### Dependencies:
+  
+  - matplotlib
+  - pandas
+  - plotnine
+  
+  
   
   
   
