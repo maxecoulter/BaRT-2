@@ -1,7 +1,7 @@
 # BaRTv2
 
 
-Authors: Max Coulter, Runxuan Zhang, John Brown
+Authors: Max Coulter, Runxuan Zhang, John Brown, Juan Carlos Entizne, Wenbin Guo
 
 
 These scripts were used for filtering the deep Iso-Seq data for construction of BaRTv2.0,  a barley cv. Barke reference transcriptome. Below is a brief description of how these scripts can be run. A detailed explanation of the methodology used in the scripts and the workflow is described in the BaRTv2.0 paper (Coulter et al., unpublished).
@@ -10,18 +10,15 @@ Two scripts, **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomia
 
 The others scripts were used specifically for analysing pacbio data for the BaRTv2 transcriptome. I will explain what they do but they won't work out of the box and will require adjusting. 
 
-All python scripts (except those associated with tama) require python >= 3.6.
+All python scripts (except those associated with tama) require python >= 3.6. Check the tama repo for its requirements and dependencies (https://github.com/GenomeRIK/tama/wiki).
 
 ## Overview of the pipeline
 
+The schematic below explains the whole pipeline for developing the BaRTv2 transcriptome (**Figure 1**). You can see that the short read and long read datasets are processed seperately at first (**Figure 1A, 1B**). The two datasets are then combined and further filtering is carried out (**Figure 1C**).
+
 ![Figure 1](https://github.com/maxecoulter/BaRT-2/blob/master/Figures/Figure%201%20BaRT2%20JB%2027May2021.png)
 
-**Figure 1** Outline of the pipeline used to generate BaRTv2.18. Iso-seq and Illumina datasets were processed separately (A, B) and then combined at the final stage (C). Software and scripts are indicated in brackets, with “custom” referring to custom code. A) For the Iso-seq dataset, raw subreads were pre-processed using Isoseq3 software (CCS, lima and refine) to create full length non chimeric reads. These reads were mapped to the Barke genome using Minimap2. Mapped reads were used as input for TAMA collapse and TAMA merge to create a set of unfiltered transcripts. Filtering was carried out using custom methods and code described in Figure 2, to remove fragments, unsupported splice junctions and TSS/TES. Transcripts from genes with low read end support that had HC splice junctions were kept in a separate file for potential inclusion depending on similarity to Illumina transcripts. Redundant transcripts were removed using TAMA merge to create BaRTv2.0-Iso. B) Illumina reads were trimmed using Trimmomatic and mapped to the Barke genome using STAR. Transcripts were assembled using three separate assemblers: Cufflinks, Stringtie and Scallop. The resulting assemblies were merged and filtered using the RTDmaker software. The resulting annotation was further filtered to remove transcripts overlapping Ns and transcripts with no strand information to create the BaRTv2.0-Illumina dataset. C) The BaRTv2.0-Iso and BaRTv2.0-Illumina datasets were merged using TAMA merge (giving priority to BaRTv2.0-Iso based transcripts). Further filtering was carried out using custom code to remove redundant Illumina transcripts. Duplicate transcripts were removed  using seqkit rmdup, as well as potential rRNA. The resulting transcriptome BaRTv2.10 went through further filtering steps with RTDmaker including removal of low expressed mono-exon genes based on Salmon quantifications to generate the final transcriptome BaRTv2.18.
-
-![Figure 2](https://github.com/maxecoulter/BaRT-2/blob/master/Figures/Figure%202.png)
-
-**Figure 2: Overview of generation of BaRTv2.0-Iso using HC SJ, TSS and TES datasets using BaRT_generate_filter_information.py and BaRT_2_filter_binomial.py** A) The high confidence dataset of SJs was generated from Iso-seq data using the error distribution profiles around SJs to remove false SJs and from Illumina SJ data. B) The HC TSS and TES dataset was generated from iso-seq data using two methods dependent on transcript abundance. C) the unfiltered Iso-seq transcript dataset was filtered against the HC SJ, TSS and TES datasets and only transcripts with HC information were retained in BaRTv2.0-Iso.
-
+**Figure 1** Outline of the pipeline used to generate BaRTv2.18. Iso-seq and Illumina datasets were processed separately (A, B) and then combined at the final stage (C). Software and scripts are indicated in brackets, with “custom” referring to custom code. A) For the Iso-seq dataset, raw subreads were pre-processed using Isoseq3 software (CCS, lima and refine) to create full length non chimeric reads. These reads were mapped to the Barke genome using Minimap2. Mapped reads were used as input for TAMA collapse and TAMA merge to create a set of unfiltered transcripts. Filtering was carried out using custom methods and code described in **Figure 2**, to remove fragments, unsupported splice junctions and TSS/TES. Transcripts from genes with low read end support that had HC splice junctions were kept in a separate file for potential inclusion depending on similarity to Illumina transcripts. Redundant transcripts were removed using TAMA merge to create BaRTv2.0-Iso. B) Illumina reads were trimmed using Trimmomatic and mapped to the Barke genome using STAR. Transcripts were assembled using three separate assemblers: Cufflinks, Stringtie and Scallop. The resulting assemblies were merged and filtered using the RTDmaker software. The resulting annotation was further filtered to remove transcripts overlapping Ns and transcripts with no strand information to create the BaRTv2.0-Illumina dataset. C) The BaRTv2.0-Iso and BaRTv2.0-Illumina datasets were merged using TAMA merge (giving priority to BaRTv2.0-Iso based transcripts). Further filtering was carried out using custom code to remove redundant Illumina transcripts. Duplicate transcripts were removed  using seqkit rmdup, as well as potential rRNA. The resulting transcriptome BaRTv2.10 went through further filtering steps with RTDmaker (https://github.com/anonconda/RTDmaker) including removal of low expressed mono-exon genes based on Salmon quantifications to generate the final transcriptome BaRTv2.18.
 
 
 
@@ -29,7 +26,11 @@ All python scripts (except those associated with tama) require python >= 3.6.
 
 The filtering is based on the output from tama collapse and tama merge (https://github.com/GenomeRIK/tama/wiki), a program used to create gene and transcript coordinates from Iso-Seq mappings. The outputs from these programs are required for running of filtering. 
 
-The scripts generate datasets of high confidence splice junctions and high confidence transcript start and end sites. These are used for the basis of filtering the .bed file. This will remove transcripts with low read support, or those that have poorly supported splice junctions, or poorly supported start or end sites. More detail on the algorithms can be found in the BaRTv2 paper.
+An overview of the processing that these scripts carry out is described in **Figure 2**. The scripts generate datasets of high confidence splice junctions and high confidence transcript start and end sites. These are used for the basis of filtering the .bed file. This will remove transcripts with low read support, or those that have poorly supported splice junctions, or poorly supported start or end sites. More detail on the algorithms can be found in the BaRTv2 paper.
+
+![Figure 2](https://github.com/maxecoulter/BaRT-2/blob/master/Figures/Figure%202.png)
+
+**Figure 2: Overview of generation of BaRTv2.0-Iso using BaRT_generate_filter_information.py and BaRT_2_filter_binomial.py** A) The high confidence dataset of SJs was generated from Iso-seq data using the error distribution profiles around SJs to remove false SJs and from Illumina SJ data. B) The HC TSS and TES dataset was generated from iso-seq data using two methods dependent on transcript abundance. C) the unfiltered Iso-seq transcript dataset was filtered against the HC SJ, TSS and TES datasets and only transcripts with HC information were retained in BaRTv2.0-Iso.
 
 The filtering of the Iso-Seq has two modules: **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**.
 
