@@ -1,4 +1,4 @@
-# BaRTv2.0
+# BaRTv2
 
 
 Authors: Max Coulter, Runxuan Zhang, John Brown
