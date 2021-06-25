@@ -12,6 +12,14 @@ The others scripts were used specifically for analysing pacbio data for the BaRT
 
 All python scripts (except those associated with tama) require python >= 3.6.
 
+## Overview of the pipeline
+
+https://github.com/maxecoulter/BaRT-2/blob/master/Figures/Figure%201%20BaRT2%20JB%2027May2021.png
+
+*Figure 1* Outline of the pipeline used to generate BaRTv2.18. Iso-seq and Illumina datasets were processed separately (A, B) and then combined at the final stage (C). Software and scripts are indicated in brackets, with “custom” referring to custom code. A) For the Iso-seq dataset, raw subreads were pre-processed using Isoseq3 software (CCS, lima and refine) to create full length non chimeric reads. These reads were mapped to the Barke genome using Minimap2. Mapped reads were used as input for TAMA collapse and TAMA merge to create a set of unfiltered transcripts. Filtering was carried out using custom methods and code described in Figure 2, to remove fragments, unsupported splice junctions and TSS/TES. Transcripts from genes with low read end support that had HC splice junctions were kept in a separate file for potential inclusion depending on similarity to Illumina transcripts. Redundant transcripts were removed using TAMA merge to create BaRTv2.0-Iso. B) Illumina reads were trimmed using Trimmomatic and mapped to the Barke genome using STAR. Transcripts were assembled using three separate assemblers: Cufflinks, Stringtie and Scallop. The resulting assemblies were merged and filtered using the RTDmaker software. The resulting annotation was further filtered to remove transcripts overlapping Ns and transcripts with no strand information to create the BaRTv2.0-Illumina dataset. C) The BaRTv2.0-Iso and BaRTv2.0-Illumina datasets were merged using TAMA merge (giving priority to BaRTv2.0-Iso based transcripts). Further filtering was carried out using custom code to remove redundant Illumina transcripts. Duplicate transcripts were removed  using seqkit rmdup, as well as potential rRNA. The resulting transcriptome BaRTv2.10 went through further filtering steps with RTDmaker including removal of low expressed mono-exon genes based on Salmon quantifications to generate the final transcriptome BaRTv2.18.
+
+
+
 
 ## Filtering of Iso-seq data using **BaRT_generate_filter_information.py** and **BaRT_2_filter_binomial.py**
 
