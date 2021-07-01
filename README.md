@@ -271,6 +271,18 @@ python BaRT_2_filter_binomial.py [-i] [-bed] [-bedn] [-sr] [-g] [-pA] [-s] [-o]
   #### Dependencies:
   
    - tama
+  ### Short read assembly pipeline
+  
+  These are the commands run to produce the short read based transcriptome that was fed into RTDmaker (See first part of Figure 1A).
+  
+  #### Dependencies:
+  
+  - Trimmomatic 0.39
+  - STARv2
+  - Stringtie 2.0
+  - Cufflinks 2.2.1
+  - Scallop 0.10.4
+  
   
   ### BaRT_merge.sh
   
