@@ -89,7 +89,7 @@ STAR \
 
 ```
 
-## Transcript assemnly
+## Transcript assembly
 ### Cufflinks
 
 ```shell
