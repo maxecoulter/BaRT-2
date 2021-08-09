@@ -901,6 +901,10 @@ def write_outputs(path,path2,outputfile_prefix,lowconfidence_genes,tama_merge_in
 	reportout.write("Total number of low confidence splice junctions (removed) non canonical: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["non_canonical"]])) + "\n")
 	reportout.write("Total number of low confidence splice junctions (removed) sequence error: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["error"]])) + "\n")
 	reportout.write("Total number of low confidence splice junctions (removed) potential template switch: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["RT switch"]])) + "\n")
+	reportout.write("Total number of low confidence splice junctions (removed) non canonical and sequence error only: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["non_canonical"] and list_of_sj_fails[sj]["error"] and not list_of_sj_fails[sj]["RT switch"]])) + "\n")
+	reportout.write("Total number of low confidence splice junctions (removed) non canonical and potential template switch only: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["non_canonical"] and list_of_sj_fails[sj]["RT switch"] and not list_of_sj_fails[sj]["error"]])) + "\n")
+	reportout.write("Total number of low confidence splice junctions (removed) error and potential template switch only: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["error"] and list_of_sj_fails[sj]["RT switch"] and not list_of_sj_fails[sj]["non_canonical"]])) + "\n")
+	reportout.write("Total number of low confidence splice junctions (removed) non canonical, error and potential template switch: " + '{:,}'.format(len([sj for sj in list_of_sj_fails.keys() if list_of_sj_fails[sj]["error"] and list_of_sj_fails[sj]["RT switch"] and list_of_sj_fails[sj]["non_canonical"]])) + "\n")
 	
 	
 	reportout.close()
